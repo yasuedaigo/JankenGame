@@ -6,27 +6,34 @@ import java.util.Random;
 public class JankenGame {
     private static final Scanner STDIN = new Scanner(System.in);
     private static final Random RANDOM = new Random();
-    private static Boolean isFirst = true;
+    private static boolean isFirst = true;
     private static final String INTRODUCTION_MESSAGE = "じゃんけん勝負\r\nグーチョキパーを数字で入力してね";
     private static final String START_MESSAGE = "最初はぐー、じゃんけん：";
     private static final String WIN_MESSAGE = "あなたの勝ち";
     private static final String LOSE_MESSAGE = "あなたの負け";
     private static final String DRAW_MESSAGE = "あいこだよ!";
     private static final String REMATCH_MESSAGE = "あいこで：";
-
+    private static final String HANDINDEX_MESSAGE = "%d:%s";
+    private static final String READYJANKEN_MESSAGE = "%s(COM)と%s(Player)で…";
+    private static final String GOO = "ぐー";
+    private static final String CHOKI = "ちょき";
+    private static final String PAA = "ぱー";
     private static final List<String> HANDLIST = new ArrayList<>() {
         {
-            add("グー");
-            add("チョキ");
-            add("パー");
+            add(GOO);
+            add(CHOKI);
+            add(PAA);
         }
     };
 
     public static void main(String[] args) {
         System.out.println(INTRODUCTION_MESSAGE);
         showMenuOfHand();
-        playJanken();
-
+        for(int i=0;i<=3;i++){
+            playJanken();
+            playAttimuitehoi();
+        }
+        showGameResultMessage();
     }
 
     private static void playJanken() {
@@ -52,18 +59,18 @@ public class JankenGame {
     }
 
     private static boolean isWin(String selectHand, String opponentHand) {
-        if (selectHand == "グー") {
-            if (opponentHand == "チョキ") {
+        if (selectHand.equals(GOO)) {
+            if (opponentHand == CHOKI) {
                 return true;
             }
         }
-        if (selectHand == "チョキ") {
-            if (opponentHand == "パー") {
+        if (selectHand.equals(CHOKI)) {
+            if (opponentHand.equals(PAA)) {
                 return true;
             }
         }
-        if (selectHand == "パー") {
-            if (opponentHand == "グー") {
+        if (selectHand.equals(PAA)) {
+            if (opponentHand.equals(GOO)) {
                 return true;
             }
         }
@@ -85,7 +92,7 @@ public class JankenGame {
     private static void showMenuOfHand() {
         int count = 0;
         for (String hand : HANDLIST) {
-            System.out.println(String.format("%d:%s", count, hand));
+            System.out.println(String.format(HANDINDEX_MESSAGE, count, hand));
             count++;
         }
         System.out.println();
@@ -100,7 +107,7 @@ public class JankenGame {
     }
 
     private static void showJudgeMessage(String selectHand, String opponentHand) {
-        System.out.println(String.format("%s(COM)と%s(Player)で…", opponentHand, selectHand));
+        System.out.println(String.format(READYJANKEN_MESSAGE, opponentHand, selectHand));
     }
 
     private static String receiveSelectHand() {
@@ -114,8 +121,8 @@ public class JankenGame {
     }
 
     private static String getRandomHand() {
-        int handInt = RANDOM.nextInt(HANDLIST.size());
-        return HANDLIST.get(handInt);
+        int handIndex = RANDOM.nextInt(HANDLIST.size());
+        return HANDLIST.get(handIndex);
     }
 
     private static int receiveinput() {
@@ -139,7 +146,7 @@ public class JankenGame {
         }
     }
 
-    private static String convertToHand(int handInt) {
-        return HANDLIST.get(handInt);
+    private static String convertToHand(int handIndex) {
+        return HANDLIST.get(handIndex);
     }
 }
