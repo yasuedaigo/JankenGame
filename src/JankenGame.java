@@ -8,13 +8,15 @@ public class JankenGame {
     private static final Random RANDOM = new Random();
     private static final String INTRODUCTION_MESSAGE = "じゃんけん勝負\r\nグーチョキパーを数字で入力してね";
     private static final String JANKENSTART_MESSAGE = "最初はぐー、じゃんけん：";
+    private static final String OUTOFBOUNDS_MESSAGE = "正しい数字を入力してください";
+    private static final String NUMBERERROR_MESSAGE = "数字ではありません";
     private static final String ATTIMUITEHOISTART_MESSAGE = "%s:あっちむいてほい : ";
     private static final String JUDGE_MESSAGE = "%s(%s)と%s(%s)で…";
     private static final String DRAWATTIMUITEHOI_MESSAGE = "引き分け";
-    private static final String WIN_MESSAGE = "あなたの勝ち";
-    private static final String LOSE_MESSAGE = "あなたの負け";
+    private static final String WINJANKEN_MESSAGE = "あなたの勝ち";
+    private static final String LOSEJANKEN_MESSAGE = "あなたの負け";
     private static final String DRAWJANKEN_MESSAGE = "あいこだよ!";
-    private static final String REMATCH_MESSAGE = "あいこで：";
+    private static final String REMATCHJANKEN_MESSAGE = "あいこで：";
     private static final String MOVEMENU_MESSAGE = "%d:%s";
     private static final String GAMERESULT_MESSAGE = "%d勝 %d敗 %d引き分け";
     private static final String GOO = "ぐー";
@@ -27,10 +29,11 @@ public class JankenGame {
     private static int winCount = 0;
     private static int loseCount = 0;
     private static int drowCount = 0;
-    private static enum Player{
-        あなた,
-        COM,
+
+    private static enum Player {
+        あなた, COM,
     };
+
     private static final List<String> HANDLIST = new ArrayList<>() {
         {
             add(GOO);
@@ -49,7 +52,7 @@ public class JankenGame {
 
     public static void main(String[] args) {
         System.out.println(INTRODUCTION_MESSAGE);
-        for(int i=0;i<3;i++){
+        for (int i = 0; i < 3; i++) {
             boolean isFirstJanken = true;
             Player jankenWinPlayer;
             jankenWinPlayer = playJanken(isFirstJanken);
@@ -61,7 +64,7 @@ public class JankenGame {
     private static Player playJanken(boolean isFirstJanken) {
         showMenuOfMove(HANDLIST);
         showJankenStartMessage(isFirstJanken);
-        String playerHand = receiveSelectHand();
+        String playerHand = receivePlayerMove(HANDLIST);
         String comHand = getRandomMove(HANDLIST);
         showJudgeMessage(playerHand, comHand);
         if (isDrawJanken(playerHand, comHand)) {
@@ -76,22 +79,21 @@ public class JankenGame {
     }
 
     private static void playAttimuitehoi(Player winJankenPlayer) {
-        //Player defencePlayer = getDefencePlayer(winJankenPlayer);
         showMenuOfMove(DIRECTIONLIST);
         showAttimuitehoiStartMessage(winJankenPlayer);
         String playerDirection = receivePlayerMove(DIRECTIONLIST);
         String comDirection = getRandomMove(DIRECTIONLIST);
-        showJudgeMessage(playerDirection,comDirection);
-        showAttimuitehoiResultMessage(comDirection,playerDirection,winJankenPlayer);
-        calcScore(comDirection,playerDirection,winJankenPlayer);
+        showJudgeMessage(playerDirection, comDirection);
+        showAttimuitehoiResultMessage(comDirection, playerDirection, winJankenPlayer);
+        calcScore(comDirection, playerDirection, winJankenPlayer);
     }
 
     private static void showJankenResultMessage(String playerHand, String comHand) {
         if (isWinJanken(playerHand, comHand)) {
-            System.out.println(WIN_MESSAGE);
+            System.out.println(WINJANKEN_MESSAGE);
             return;
         }
-        System.out.println(LOSE_MESSAGE);
+        System.out.println(LOSEJANKEN_MESSAGE);
     }
 
     private static boolean isWinJanken(String playerHand, String comHand) {
@@ -114,26 +116,26 @@ public class JankenGame {
     }
 
     private static boolean isWinJanken(Player winJankenPlayer) {
-        if(winJankenPlayer == Player.あなた){
+        if (winJankenPlayer == Player.あなた) {
             return true;
         }
         return false;
     }
 
-    private static void calcScore(String comDirection,String playerDirection,Player winJankenPlayer){
-        if(isDrowAttimuitehoi(comDirection,playerDirection)){
+    private static void calcScore(String comDirection, String playerDirection, Player winJankenPlayer) {
+        if (isDrowAttimuitehoi(comDirection, playerDirection)) {
             drowCount++;
             return;
         }
-        if(isWinJanken(winJankenPlayer)){
+        if (isWinJanken(winJankenPlayer)) {
             winCount++;
             return;
         }
         loseCount++;
     }
 
-    private static boolean isDrawJanken(String selectHand, String opponentHand) {
-        if (selectHand.equals(opponentHand)) {
+    private static boolean isDrawJanken(String playerHand, String comHand) {
+        if (playerHand.equals(comHand)) {
             return true;
         }
         return false;
@@ -158,75 +160,64 @@ public class JankenGame {
             System.out.print(JANKENSTART_MESSAGE);
             return;
         }
-        System.out.print(REMATCH_MESSAGE);
+        System.out.print(REMATCHJANKEN_MESSAGE);
     }
 
-    private static void showAttimuitehoiStartMessage(Player winJankenPlayer){
-        System.out.print(String.format(ATTIMUITEHOISTART_MESSAGE,winJankenPlayer.toString()));
+    private static void showAttimuitehoiStartMessage(Player winJankenPlayer) {
+        System.out.print(String.format(ATTIMUITEHOISTART_MESSAGE, winJankenPlayer.toString()));
     }
 
     private static void showJudgeMessage(String playerHand, String comHand) {
-        System.out.println(String.format(JUDGE_MESSAGE, playerHand,Player.あなた.toString(), comHand,Player.COM.toString()));
+        System.out.println(
+                String.format(JUDGE_MESSAGE, playerHand, Player.あなた.toString(), comHand, Player.COM.toString()));
     }
 
-    private static void showGameResultMessage(){
-        System.out.println(String.format(GAMERESULT_MESSAGE, winCount,loseCount,drowCount));
+    private static void showGameResultMessage() {
+        System.out.println(String.format(GAMERESULT_MESSAGE, winCount, loseCount, drowCount));
     }
 
-    private static void showAttimuitehoiResultMessage(String comDirection,String playerDirection,Player winJankenPlayer){
-        if(isDrowAttimuitehoi(comDirection,playerDirection)){
+    private static void showAttimuitehoiResultMessage(String comDirection, String playerDirection,
+            Player winJankenPlayer) {
+        if (isDrowAttimuitehoi(comDirection, playerDirection)) {
             System.out.println(DRAWATTIMUITEHOI_MESSAGE);
             return;
         }
-        if(isWinJanken(winJankenPlayer)){
-            System.out.println(WIN_MESSAGE);
+        if (isWinJanken(winJankenPlayer)) {
+            System.out.println(WINJANKEN_MESSAGE);
             return;
         }
-        System.out.println(LOSE_MESSAGE);
+        System.out.println(LOSEJANKEN_MESSAGE);
     }
 
-    private static boolean isDrowAttimuitehoi(String comDirection,String playerDirection){
-        if(comDirection == playerDirection){
+    private static boolean isDrowAttimuitehoi(String comDirection, String playerDirection) {
+        if (comDirection.equals(playerDirection)) {
             return false;
         }
         return true;
     }
 
-    private static String receiveSelectHand() {
-        try {
-            int inputNumber = receiveinput();
-            String selectHand = convertToMove(inputNumber,HANDLIST);
-            return selectHand;
-        } catch (Exception e) {
-            return receiveSelectHand();
-        }
-    }
-
     private static int receiveinput() {
         String inputStr;
-        int inputNumber;
+        int inputIndex;
         inputStr = STDIN.nextLine();
         if (!isNumber(inputStr)) {
-            inputNumber = receiveinput();
-            return inputNumber;
+            System.out.println(NUMBERERROR_MESSAGE);
+            inputIndex = receiveinput();
+            return inputIndex;
         }
-        inputNumber = Integer.parseInt(inputStr);
-        return inputNumber;
+        inputIndex = Integer.parseInt(inputStr);
+        return inputIndex;
     }
 
     private static String receivePlayerMove(List<String> moveList) {
         try {
-            int inputNumber = receiveinput();
-            String selectMove = convertToMove(inputNumber,moveList);
+            int inputIndex = receiveinput();
+            String selectMove = convertToMove(inputIndex, moveList);
             return selectMove;
-        } catch (Exception e) {
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println(OUTOFBOUNDS_MESSAGE);
             return receivePlayerMove(moveList);
         }
-    }
-
-    private static String getRandomHand() {
-        int handIndex = RANDOM.nextInt(HANDLIST.size());
-        return HANDLIST.get(handIndex);
     }
 
     private static String getRandomMove(List<String> moveList) {
@@ -243,25 +234,14 @@ public class JankenGame {
         }
     }
 
-    /*private static String convertToHand(int handIndex) {
-        return HANDLIST.get(handIndex);
-    }*/
-
-    private static String convertToMove(int index,List<String> moveList){
+    private static String convertToMove(int index, List<String> moveList) {
         return moveList.get(index);
     }
 
-    private static Player getDefencePlayer(Player attackPlayer){
-        if(attackPlayer == Player.あなた){
-            return Player.COM;
-        }
-        return Player.あなた;
-    }
-
-    private static Player getJankenWinPlayer(String playerHand,String comHand){
-        if(isWinJanken(playerHand,comHand)){
+    private static Player getJankenWinPlayer(String playerHand, String comHand) {
+        if (isWinJanken(playerHand, comHand)) {
             return Player.あなた;
         }
-        return  Player.COM;
+        return Player.COM;
     }
 }
